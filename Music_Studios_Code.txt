@@ -1,0 +1,382 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+enum Genre{ pop, rock, metal, rap };
+class CSongs
+{
+	protected:
+	string songname;
+	string singer;
+	string video;
+	int year;
+	Genre genre;
+	public:
+	CSongs()
+	{
+		songname = " ";
+		singer = " ";
+		video = "No";
+		year = 0;
+		genre = pop;
+	}
+	CSongs(const CSongs &s)
+	{
+	songname = s.songname;
+	singer = s.singer;
+	video = s.video;
+	year = s.year;
+	genre = s.genre;
+	}
+	CSongs(string name, string sing, string vid, int y, Genre g)
+	{
+		songname = name;
+		singer = sing;
+		video = vid;
+		year = y;
+		genre = g;
+	}
+
+	void setname(string name)
+	{
+		songname = name;
+	}
+
+	void setsinger(string sing)
+	{
+		singer = sing;
+	}
+
+	void setvideo(string vid)
+	{
+		video = vid;
+	}
+
+	void setyear(int y)
+	{
+		year = y;
+	}
+
+	void setgenre(Genre g)
+	{
+		genre = g;
+	}
+
+	string getname()
+	{
+		return songname;
+	}
+
+	string getsinger()
+	{
+		return singer;
+	}
+
+	string setvideo()
+	{
+		return video;
+	}
+
+	int getyear()
+	{
+		return year;
+	}
+	
+	Genre getgenre()
+	{
+		return genre;
+	}
+
+	void save()
+	{
+		ofstream file;
+		file.open("savefile.txt");
+		file << songname << " " << singer << " " << video << " " << year << " " << genre ;
+		file.close();
+	}
+
+	friend ostream &operator <<(ostream& ostr, const CSongs& s)
+	{
+		ostr << s.songname << " " << s.singer << " " << s.video  << " " << s.year << " " << s.genre << endl;
+		return ostr;
+	}
+
+	void print()
+	{
+		cout << "Song: " << songname << endl;
+		cout << "By: " << singer << endl;
+		cout << "Video: " << video << endl;
+		cout << "Made in: " << year << endl;
+		cout << "Genre: ";
+		switch (genre)
+		{
+			case 0:
+				cout << "pop" << endl;
+				break;
+			case 1:
+				cout << "rock" << endl;
+				break;
+			case 2:
+				cout << "metal" << endl;
+				break;
+			case 3:
+				cout << "rap" << endl;
+				break;
+		}
+	}
+
+	bool isGenre()
+	{
+		if (genre == pop || genre == rock || genre == metal || genre == rap)return true;
+		else return false;
+	}
+
+	int calcage()
+	{
+		return 2021-year;
+	}
+
+	CSongs operator =(CSongs &s)
+	{
+		this->songname = s.songname;
+		this->singer = s.singer;
+		this->video = s.video;
+		this->year = s.year;
+		this->genre = s.genre;
+		return *this;
+	}
+
+	bool operator <( CSongs &s)
+	{
+		if (this->calcage() < s.calcage())return true;
+		else return false;
+	}
+
+	bool operator==(const CSongs& s)
+	{
+		if (singer == s.singer)return true;
+		else return false;
+	}
+
+	bool hasvid()
+	{
+		if (video == "yes")return true;
+		else return false;
+	}
+};
+
+class CStudio : public CSongs
+{
+	protected:
+	vector<CSongs> songs;
+	string studioname;
+	int albums;
+	int income;
+	public:
+	CStudio(const CStudio &s)
+	{
+		songs = s.songs;
+		studioname = s.studioname;
+		albums = s.albums;
+		income = s.income;
+	}
+	
+	CStudio(vector<CSongs> a, string b, int c, int d)
+	{
+		songs = a;
+		studioname = b;
+		albums = c;
+		income = d;
+	}
+	
+	bool isReleased()
+	{
+		if (albums > 1)
+		return false;
+		else return true;
+	}
+	
+	int getAlbums()
+	{
+		return albums;
+	}
+
+	const vector<CSongs> getSongs()
+	{
+		return songs;
+	}
+
+	string getstudio()
+	{
+		return studioname;
+	}
+
+	void savealbum()
+	{
+		ofstream file;
+		file.open("savefile.txt", ios::app);
+		for (vector<CSongs>::iterator it = songs.begin(); it != 
+		songs.end(); it++)
+		{
+			file << *it;
+		}
+		file << studioname << " " << albums << " " << income << endl;
+		file.close();
+	}
+
+	void printalbum()
+	{
+		for (vector<CSongs>::iterator it = songs.begin(); it != songs.end(); it++)
+		{
+			(*it).print();
+		}
+		cout << "Studio: " << studioname << endl;
+		cout << "Albums: " << albums << endl;
+		cout << "Income: " << income << endl;
+	}
+};
+
+void outputGenre(vector<CStudio> studio, Genre g)
+{
+	for (vector<CStudio>::iterator it = studio.begin(); it != studio.end(); it++)
+	{
+		vector<CSongs>vec = (*it).getSongs();
+		for (vector<CSongs>::iterator it2 = vec.begin(); it2 != 
+		vec.end(); it2++)
+		{
+			if ((*it).getgenre() == g && (*it2).calcage() == 3)
+			{
+				(*it2).print();
+				cout << "By studio: " << (*it).getstudio() << endl;
+			}
+		}
+	}
+}
+
+void main()
+{
+	vector<CStudio> studios;
+	studios.reserve(10);
+	vector<CSongs> allsongs, songs1, songs2, songs3, 
+	songs4;
+	string name;
+	int choice;
+	int genrechoice;
+	CSongs song1("Drop it like it's hot", "Haarper", "no", 2020, rap);
+	CSongs song2("B.Zero", "Haarper", "yes", 2021, rap);
+	CSongs song3("Welcome", "Beyonce", "yes", 2018, pop);
+	songs1.push_back(song1);
+	songs1.push_back(song2);
+	songs1.push_back(song3);
+	CStudio studio1(songs1, "VoidTracks", 20, 380000);
+	studios.push_back(studio1);
+	CSongs song4("Genesis", "Dua Lipa", "yes", 2017, pop);
+	CSongs song5("Migrate", "Mariah Carey", "yes", 2008, pop);
+	CSongs song6("Umbrella", "Rihanna", "no", 2008, pop);
+	songs2.push_back(song4);
+	songs2.push_back(song5);
+	songs2.push_back(song6);
+	CStudio studio2(songs2, "Pop Music Studios", 202, 900000);
+	studios.push_back(studio2);
+	CSongs song7("Dear Self", "Nine Lashes", "yes", 2021, rock);
+	CSongs song8("Dear Self", "Nine Lashes", "no", 2020, rock);
+	CSongs song9("T.N.T", "AC/DC", "no", 1975, rock);
+	songs3.push_back(song7);
+	songs3.push_back(song8);
+	songs3.push_back(song9);
+	CStudio studio3(songs3, "Montage Rock ", 30, 5000000);
+	studios.push_back(studio3);
+	CSongs song10("Voice of the Soul", "Death", "no", 1998, metal);
+	songs4.push_back(song10);
+	CStudio studio4(songs4, "Relapse Records", 1, 150000);
+	studios.push_back(studio4);
+	cout << "Options: " << endl;
+	cout << "1.Save studios with over 20 albums to file." << endl;
+	cout << "2.Print studios with more than one album by a single singer." << endl;
+	cout << "3.Print songs by a inputed singer that are identical." << endl;
+	cout << "4.Print studios with unique albums." << endl;
+	cout << "5.Print songs from inputed genre which were created 3 years ago." << endl;
+	cout << "Input your choice: ";
+	cin >> choice;
+	switch (choice)
+	{
+		case 1:
+		// III.1
+			for (vector<CStudio>::iterator it = studios.begin(); it != studios.end(); it++)
+			{
+				if ((*it).getAlbums() > 20)
+				{
+					(*it).savealbum();
+				}
+			}
+			cout << "Studios with over 20 albums have been saved to file" << endl;
+			break;
+		case 2:
+		// III.2 
+			for (vector<CStudio>::iterator it = studios.begin(); it != studios.end(); it++)
+			{
+				allsongs = (*it).getSongs();
+				for (int i = 1; i < allsongs.size(); i++)
+				{
+					if ((*it).isReleased() == false && allsongs[i] == allsongs[i - 1])
+					{
+						cout << (*it).getstudio() << " have multiple albums of 
+						singer: " << allsongs[i-1].getsinger() << endl;
+					}
+				else if ((*it).isReleased() == false)
+				cout << (*it).getstudio() << " have multiple albums of singer: " << allsongs[i].getsinger() << 				endl;
+				}
+			}
+			break;
+		case 3:
+		//III.3 
+			cout << "Input name of singer: ";
+			cin >> name;
+			for (vector<CStudio>::iterator it = studios.begin(); it != studios.end(); it++)
+			{
+				allsongs = (*it).getSongs();
+				for (int i = 1; i < allsongs.size(); i++)
+				{
+					if (allsongs[i].getsinger() == name && allsongs[i] == allsongs[i - 1])
+					{
+						if (allsongs[i].getname() == allsongs[i - 1].getname())
+						cout << allsongs[i].getname() << endl;
+					}
+				}
+			}
+			break;
+		case 4:
+		//III.4
+			for (vector<CStudio>::iterator it = studios.begin(); it != studios.end(); it++)
+			if ((*it).isReleased() == true)
+			{
+				(*it).printalbum();
+			}
+			break;
+		case 5:
+			cout << "Select genre: " << endl;
+			cout << "1.Pop" << endl;
+			cout << "2.Rock" << endl;
+			cout << "3.Metal" << endl;
+			cout << "4.Rap" << endl;
+			cout << "Input your choice: ";
+			cin >> genrechoice;
+			switch (genrechoice)
+			{
+				case 1:
+					outputGenre(studios, pop);
+					break;
+				case 2:
+					outputGenre(studios, rock);
+					break;
+				case 3:
+					outputGenre(studios, metal);
+					break;
+				case 4:
+					outputGenre(studios, rap);
+					break;
+			}
+	}
+}
